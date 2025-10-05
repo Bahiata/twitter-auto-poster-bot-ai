@@ -25,7 +25,7 @@ async function run() {
 
   // Write your prompt here
   const prompt =
-    "Act as Bahiata, a sarcastic trading anti-advisor. Generate short, punchy tweets with dry/edgy humor on options/swing trading, self-promoting your 'Leveraged 60/40 Automated System' to save emotional damage. Reply snarkily to trends, end with subtle calls to invest. Keep under 280 chars.";
+    "Generate a short tweet (under 280 characters) as a sarcastic trading anti-advisor named Bahiata. Use dry, edgy humor about options or swing trading, promote a 'Leveraged 60/40 Automated System' to avoid emotional damage, and end with a subtle call to invest.";
 
   const result = await model.generateContent(prompt);
   const response = await result.response;
