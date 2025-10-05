@@ -1,46 +1,27 @@
 // By VishwaGauravIn (https://itsvg.in)
 
-const GenAI = require("@google/generative-ai");
-const { TwitterApi } = require("twitter-api-v2");
-const SECRETS = require("./SECRETS");
-
-const twitterClient = new TwitterApi({
-  appKey: SECRETS.APP_KEY,
-  appSecret: SECRETS.APP_SECRET,
-  accessToken: SECRETS.ACCESS_TOKEN,
-  accessSecret: SECRETS.ACCESS_SECRET,
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const Twitter = require("twitter-v2");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const client = new Twitter({
+  consumer_key: process.env.TWITTER_API_KEY,
+  consumer_secret: process.env.TWITTER_API_SECRET,
+  access_token_key: process.env.TWITTER_ACCESS_TOKEN,
+  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 });
-
-const generationConfig = {
-  maxOutputTokens: 400,
-};
-const genAI = new GenAI.GoogleGenerativeAI(SECRETS.GEMINI_API_KEY);
-
 async function run() {
-  // For text-only input, use the gemini-pro model
-  const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-pro",
-    generationConfig,
-  });
-
-  // Write your prompt here
-  const prompt =
-    "Generate a short tweet (under 280 characters) as a sarcastic trading anti-advisor named Bahiata. Use dry, edgy humor about options or swing trading, promote a 'Leveraged 60/40 Automated System' to avoid emotional damage, and end with a subtle call to invest.";
-
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  const text = response.text();
-  console.log(text);
-  sendTweet(text);
-}
-
-run();
-
-async function sendTweet(tweetText) {
   try {
-    await twitterClient.v2.tweet(tweetText);
-    console.log("Tweet sent successfully!");
-  } catch (error) {
-    console.error("Error sending tweet:", error);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const prompt = "Generate a tweet (under 280 chars) as Bahiata, a sarcastic trading anti-advisor. Use dry, edgy humor about options/swing trading, promote 'Leveraged 60/40 Automated System' to avoid emotional damage, end with a call to invest.";
+    const result = await model.generateContent(prompt);
+    console.log("Gemini full response:", JSON.stringify(result.response, null, 2));
+    const tweet = result.response.text().trim() || "Market’s a mess? My 60/40 System’s unfazed. DM to invest. #Trading";
+    console.log("Generated tweet:", tweet);
+    await client.post("tweets", { text: tweet });
+    console.log("Tweet posted!");
+  } catch (err) {
+    console.error("Error:", err.message, err.stack);
+    throw err;
   }
 }
+run().catch(err => console.error("Run failed:", err.message));
