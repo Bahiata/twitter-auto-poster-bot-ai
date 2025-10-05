@@ -11,7 +11,7 @@ const client = new Twitter({
 });
 async function run() {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
     const prompt = "Generate a tweet (under 280 chars) as Bahiata, a sarcastic trading anti-advisor. Use dry, edgy humor about options/swing trading, promote 'Leveraged 60/40 Automated System' to avoid emotional damage, end with a call to invest.";
     const result = await model.generateContent(prompt);
     console.log("Gemini full response:", JSON.stringify(result.response, null, 2));
